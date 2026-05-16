@@ -26,12 +26,19 @@ export interface VaultAccess {
   expiresAt?: number; // epoch ms
 }
 
+export interface QuestionImage {
+  url: string;
+  alt: string;
+  caption?: string;
+}
+
 export interface SAQPart {
   label: string; // "a", "b", "c"
   question: string;
   marks: number;
   modelAnswer: string[];
   examinerNotes?: string;
+  image?: QuestionImage;
 }
 
 export interface SAQ {
@@ -41,4 +48,5 @@ export interface SAQ {
   parts: SAQPart[];
   reference?: string;
   tags?: string[];
+  image?: QuestionImage; // scenario-level image
 }

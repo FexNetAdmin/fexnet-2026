@@ -6,6 +6,7 @@ import {
   BookOpen, Sparkles, Loader2, AlertCircle,
 } from "lucide-react";
 import type { SAQ } from "@/types";
+import MedicalImage from "./MedicalImage";
 
 const CRITIQUE_WORKER_URL =
   process.env.NEXT_PUBLIC_CRITIQUE_WORKER_URL ?? "";
@@ -172,6 +173,9 @@ export default function SAQViewer({ saqs }: Props) {
           )}
         </div>
         <p className="text-sm leading-relaxed text-white/90">{saq.scenario}</p>
+        {saq.image && (
+          <MedicalImage image={saq.image} className="mt-4" />
+        )}
       </div>
 
       {/* Running total */}
@@ -218,6 +222,10 @@ export default function SAQViewer({ saqs }: Props) {
                     )}
                   </button>
                 </div>
+
+                {part.image && (
+                  <MedicalImage image={part.image} className="mb-3" />
+                )}
 
                 {/* User answer — textarea before reveal, read-only summary after */}
                 {!isRevealed ? (

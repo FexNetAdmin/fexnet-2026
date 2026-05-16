@@ -11,6 +11,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { Question } from "@/lib/vault/questions";
+import MedicalImage from "./MedicalImage";
 
 interface Props {
   questions: Question[];
@@ -125,9 +126,12 @@ export default function SCQQuiz({ questions }: Props) {
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 mb-4">
-          <p className="text-base font-medium text-slate-900 leading-relaxed mb-6">
+          <p className="text-base font-medium text-slate-900 leading-relaxed mb-4">
             {q.stem}
           </p>
+          {q.image && (
+            <MedicalImage image={q.image} className="mb-5" />
+          )}
           <div className="space-y-3">
             {q.options.map((opt, idx) => {
               let cls =
@@ -250,9 +254,12 @@ export default function SCQQuiz({ questions }: Props) {
 
       {/* Question card */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 mb-6">
-        <p className="text-base font-medium text-slate-900 leading-relaxed mb-6">
+        <p className="text-base font-medium text-slate-900 leading-relaxed mb-4">
           {question.stem}
         </p>
+        {question.image && (
+          <MedicalImage image={question.image} className="mb-5" />
+        )}
         <div className="space-y-3">
           {question.options.map((option, idx) => {
             let cls =

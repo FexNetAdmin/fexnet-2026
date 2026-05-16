@@ -1,3 +1,5 @@
+import type { QuestionImage } from "@/types";
+
 export interface Question {
   id: string;
   stem: string;
@@ -6,6 +8,7 @@ export interface Question {
   explanation: string;
   tags?: string[];
   reference?: string; // e.g. "NZ Formulary 2026", "ANZICS 2024"
+  image?: QuestionImage;
 }
 
 export const questionBank: Record<string, Question[]> = {
@@ -13,6 +16,11 @@ export const questionBank: Record<string, Question[]> = {
     {
       id: "cardio-001",
       stem: "A 58-year-old presents with crushing chest pain, diaphoresis, and ST elevation in leads II, III and aVF. BP 88/60 mmHg. Which vessel is most likely occluded?",
+      image: {
+        url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Inferior_STEMI.png/1200px-Inferior_STEMI.png",
+        alt: "12-lead ECG showing inferior STEMI with ST elevation in leads II, III and aVF",
+        caption: "12-lead ECG — identify the culprit vessel. (CC BY-SA, Wikimedia Commons)",
+      },
       options: ["Left anterior descending (LAD)", "Right coronary artery (RCA)", "Left circumflex (LCx)", "Left main coronary artery (LMCA)"],
       correct: 1,
       explanation: "Inferior STEMI (ST elevation II, III, aVF) with haemodynamic instability is most consistent with RCA occlusion. The RCA supplies the SA and AV nodes in ~60% and ~85% of patients respectively, explaining bradycardia and hypotension. Always obtain right-sided leads (V3R, V4R) to detect RV infarction before administering nitrates — RV infarction is a contraindication to nitrates and diuretics.",
