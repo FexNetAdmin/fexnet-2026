@@ -5,7 +5,7 @@ const VALID_TOKENS = new Set([
   // SHA-256 hashes of valid access codes — never store plaintext codes here.
   // Populated at build time from environment or managed separately.
   // Example placeholder — replace with real hashed tokens before launch.
-  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "8d90310cf261ba8e335ff57ddb0b26f7833ba6aa3cfc6eecdb9b267af8bd1ce6",
 ]);
 const TOKEN_TTL_MS = 365 * 24 * 60 * 60 * 1000; // 1 year
 
