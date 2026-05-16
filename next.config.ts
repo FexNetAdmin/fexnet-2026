@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: "export",
   reactCompiler: true,
+  trailingSlash: true, // required for GitHub Pages static file serving
+  images: {
+    unoptimized: true, // required for static export
+  },
 };
 
 export default nextConfig;

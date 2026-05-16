@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /sessions
+Allow: /about
+Disallow: /vault/
+
+# Vault module content is access-gated and must not be indexed.
+# Crawling vault/* returns locked UI only — no clinical content is exposed.
