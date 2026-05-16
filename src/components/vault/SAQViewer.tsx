@@ -1,16 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ChevronDown, ChevronUp, CheckSquare, Square,
   BookOpen, Sparkles, Loader2, AlertCircle,
 } from "lucide-react";
 import type { SAQ } from "@/types";
 
-// Set this to your Cloudflare Worker URL once deployed.
-// Leave empty to disable AI critique.
 const CRITIQUE_WORKER_URL =
   process.env.NEXT_PUBLIC_CRITIQUE_WORKER_URL ?? "";
+
+const STORAGE_KEY = "fexnet-saq-answers";
+
+function loadStoredAnswers(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveAnswers(answers: Record<string, string>) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
+  } catch {
+    // storage full or unavailable — silently ignore
+  }
+}
 
 interface Props {
   saqs: SAQ[];
@@ -27,6 +44,11 @@ export default function SAQViewer({ saqs }: Props) {
   const [selfMarked, setSelfMarked] = useState<Record<string, boolean>>({});
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [feedbacks, setFeedbacks] = useState<Record<string, Feedback>>({});
+
+  // Load persisted answers on mount
+  useEffect(() => {
+    setUserAnswers(loadStoredAnswers());
+  }, []);
 
   if (saqs.length === 0) {
     return (
@@ -55,6 +77,12 @@ export default function SAQViewer({ saqs }: Props) {
     setSelfMarked((prev) => ({ ...prev, [key]: !prev[key] }));
   }
 
+  function updateAnswer(key: string, value: string) {
+    const next = { ...userAnswers, [key]: value };
+    setUserAnswers(next);
+    saveAnswers(next);
+  }
+
   function resetQuestion() {
     const keys = saq.parts.map((p) => revealKey(p.label));
     setRevealed((prev) => {
@@ -72,13 +100,13 @@ export default function SAQViewer({ saqs }: Props) {
       keys.forEach((k) => delete next[k]);
       return next;
     });
+    // Answers are intentionally preserved across reset so users don't lose work
   }
 
   async function requestFeedback(label: string, part: { question: string; marks: number; modelAnswer: string[] }) {
     const key = revealKey(label);
     const userAnswer = userAnswers[key] ?? "";
-    if (!userAnswer.trim()) return;
-    if (!CRITIQUE_WORKER_URL) return;
+    if (!userAnswer.trim() || !CRITIQUE_WORKER_URL) return;
 
     setFeedbacks((prev) => ({ ...prev, [key]: { status: "loading" } }));
 
@@ -191,19 +219,30 @@ export default function SAQViewer({ saqs }: Props) {
                   </button>
                 </div>
 
-                {/* User answer textarea */}
-                <textarea
-                  value={userAnswer}
-                  onChange={(e) =>
-                    setUserAnswers((prev) => ({ ...prev, [key]: e.target.value }))
-                  }
-                  placeholder="Type your answer here before revealing the model answer…"
-                  rows={4}
-                  className="w-full text-sm text-slate-800 placeholder-slate-400 border border-slate-200 rounded-xl px-3 py-2.5 resize-y focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent leading-relaxed"
-                />
+                {/* User answer — textarea before reveal, read-only summary after */}
+                {!isRevealed ? (
+                  <textarea
+                    value={userAnswer}
+                    onChange={(e) => updateAnswer(key, e.target.value)}
+                    placeholder="Type your answer here before revealing the model answer…"
+                    rows={4}
+                    className="w-full text-sm text-slate-800 placeholder-slate-400 border border-slate-200 rounded-xl px-3 py-2.5 resize-y focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent leading-relaxed"
+                  />
+                ) : userAnswer.trim() ? (
+                  <div className="mb-1 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1.5">
+                      Your answer
+                    </p>
+                    <p className="text-sm text-blue-900 leading-relaxed whitespace-pre-wrap">
+                      {userAnswer}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-400 italic mb-1">No answer recorded for this part.</p>
+                )}
 
-                {/* AI feedback button */}
-                {canGetFeedback && (
+                {/* AI feedback button (only when worker URL configured) */}
+                {canGetFeedback && isRevealed && (
                   <div className="mt-2">
                     {fb.status === "idle" && (
                       <button
