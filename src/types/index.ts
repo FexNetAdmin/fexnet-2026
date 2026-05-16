@@ -25,3 +25,20 @@ export interface VaultAccess {
   isUnlocked: boolean;
   expiresAt?: number; // epoch ms
 }
+
+export interface SAQPart {
+  label: string; // "a", "b", "c"
+  question: string;
+  marks: number;
+  modelAnswer: string[];
+  examinerNotes?: string;
+}
+
+export interface SAQ {
+  id: string;
+  scenario: string;
+  totalMarks: number;
+  parts: SAQPart[];
+  reference?: string;
+  tags?: string[];
+}
