@@ -19,6 +19,8 @@ export default function VaultModuleClient({ topic }: Props) {
   const [answers, setAnswers] = useState<Record<string, AnswerState>>({});
   const [currentQ, setCurrentQ] = useState(0);
 
+  const questions = useMemo(() => getQuestionsForTopic(topic.slug), [topic.slug]);
+
   useEffect(() => {
     const { isUnlocked } = checkVaultAccess();
     setAccess(isUnlocked ? "granted" : "denied");
@@ -46,8 +48,6 @@ export default function VaultModuleClient({ topic }: Props) {
     );
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const questions = useMemo(() => getQuestionsForTopic(topic.slug), [topic.slug]);
   const hasQuestions = questions.length > 0;
   const question = hasQuestions ? questions[currentQ] : null;
   const state = question ? (answers[question.id] ?? { selected: null, revealed: false }) : { selected: null, revealed: false };
